@@ -77,11 +77,13 @@ class TaskScheduler:
                 max_instances=1,
             )
 
+            # Store job info - safely get next_run_time
+            next_run = getattr(job, 'next_run_time', None)
             self.jobs[job_id] = {
                 "status": "active",
                 "created_at": datetime.now(),
                 "last_run": None,
-                "next_run": job.next_run_time,
+                "next_run": next_run,
             }
 
             logger.info(f"Added hourly job: {job_id}")
@@ -128,11 +130,13 @@ class TaskScheduler:
                 max_instances=1,
             )
 
+            # Store job info - safely get next_run_time
+            next_run = getattr(job, 'next_run_time', None)
             self.jobs[job_id] = {
                 "status": "active",
                 "created_at": datetime.now(),
                 "last_run": None,
-                "next_run": job.next_run_time,
+                "next_run": next_run,
             }
 
             logger.info(f"Added custom interval job: {job_id} (every {interval_minutes}m)")
@@ -214,10 +218,11 @@ class TaskScheduler:
         """
         job = self.scheduler.get_job(job_id)
         if job:
+            next_run = getattr(job, 'next_run_time', None)
             return {
                 "job_id": job_id,
                 "status": self.jobs.get(job_id, {}).get("status", "unknown"),
-                "next_run": job.next_run_time,
+                "next_run": next_run,
                 "created_at": self.jobs.get(job_id, {}).get("created_at"),
             }
         return None
@@ -231,9 +236,10 @@ class TaskScheduler:
         """
         all_jobs = {}
         for job in self.scheduler.get_jobs():
+            next_run = getattr(job, 'next_run_time', None)
             all_jobs[job.id] = {
                 "name": job.name,
-                "next_run": job.next_run_time,
+                "next_run": next_run,
                 "status": self.jobs.get(job.id, {}).get("status", "unknown"),
             }
         return all_jobs
