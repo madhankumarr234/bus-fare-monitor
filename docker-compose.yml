@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  bus-fare-monitor:
+    build: .
+    container_name: bus-fare-monitor
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DATABASE_PATH=./data/fares.db
+      - BROWSER_HEADLESS=true
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config.json:/app/config.json
+    restart: unless-stopped
+    networks:
+      - bus-monitor-net
+
+networks:
+  bus-monitor-net:
+    driver: bridge
